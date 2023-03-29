@@ -19,11 +19,19 @@ class _SignupPageState extends State<SignupPage> {
   GlobalKey<FormState> globalKey = GlobalKey<FormState>();
   bool hidePassword = true;
   bool isApiCallProcess = false;
+  String email = "";
+  String firstName = "";
+  String lastName = "";
+  String password = "";
 
   @override
   void initState() {
     apiService = APIService();
-    //model = CustomerModel(email: email, firstName: firstName, lastName: lastName, password: password)
+    model = CustomerModel(
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        password: password);
     super.initState();
   }
 
@@ -39,7 +47,8 @@ class _SignupPageState extends State<SignupPage> {
         key: globalKey,
         inAsyncCall: isApiCallProcess,
         opacity: 0.3,
-        child: Form(key: globalKey, child: _formUI()),
+        color: Colors.white,
+        child: Form(child: _formUI()),
       ),
     );
   }
@@ -54,7 +63,7 @@ class _SignupPageState extends State<SignupPage> {
           alignment: Alignment.topLeft,
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            FormHelper.fieldLabel("First Name"),
+            FormHelper.fieldLabel("First Name 1"),
             FormHelper.textInput(
               context,
               model.firstName,
@@ -130,31 +139,33 @@ class _SignupPageState extends State<SignupPage> {
                   icon: Icon(
                       hidePassword ? Icons.visibility_off : Icons.visibility)),
             ),
-            const SizedBox(height: 40),
-            FormHelper.saveButton("Register", () {
-              if (validateAndSave()) {
-                //print(model.toJson());
-                setState(() {
-                  isApiCallProcess = true;
-                });
-                apiService.createCustomer(model).then((ret) {
+            const SizedBox(height: 20),
+            Center(
+              child: FormHelper.saveButton("Register", () {
+                if (validateAndSave()) {
+                  //print(model.toJson());
                   setState(() {
-                    isApiCallProcess = false;
+                    isApiCallProcess = true;
                   });
-                  if (ret) {
-                    FormHelper.showMessage(context, "WooCommerce App",
-                        "Registratin Successfull", "OK", () {
-                      Navigator.of(context).pop();
+                  apiService.createCustomer(model).then((ret) {
+                    setState(() {
+                      isApiCallProcess = false;
                     });
-                  } else {
-                    FormHelper.showMessage(context, "WooCommerce App",
-                        "Email is already registered", "OK", () {
-                      Navigator.of(context).pop();
-                    });
-                  }
-                });
-              }
-            })
+                    if (ret) {
+                      FormHelper.showMessage(context, "WooCommerce App",
+                          "Registratin Successfull", "OK", () {
+                        Navigator.of(context).pop();
+                      });
+                    } else {
+                      FormHelper.showMessage(context, "WooCommerce App",
+                          "Email is already registered", "OK", () {
+                        Navigator.of(context).pop();
+                      });
+                    }
+                  });
+                }
+              }),
+            ),
           ]),
         ),
       ),
@@ -163,8 +174,10 @@ class _SignupPageState extends State<SignupPage> {
 
   bool validateAndSave() {
     final form = globalKey.currentState;
-    if (form!.validate()) {
-      form.save();
+    bool validForm = form!.validate();
+    if (validForm) {
+      //form.save();
+      print("tab");
     } else {
       return true;
     }
